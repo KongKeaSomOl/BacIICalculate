@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ថ្នាក់វិទ្យាសាស្ត្រសង្គម</title>
+    <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/2385/2385060.png">
+ 
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center"><span style="color: #FF5733;">គណនាពិន្ទុប្រលងបាក់ឌុប ថ្នាក់វិទ្យាសាស្ត្រសង្គម</span></h1>
+        <form id="scoreForm">
+            <!-- Input fields as before -->
+            <div class="form-group">
+                <input type="number" class="form-control" id="khmerScore" min="0" max="125" placeholder="អក្សរសាស្ត្រខ្មែរ (125)" required>
+                <div class="invalid-feedback"><span style="font-size: 18px;">សូមបំពេញពិន្ទុចន្លោះពី 0 ទៅ 125</span></div>
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-control" id="mathScore" min="0" max="75" placeholder="គណិតវិទ្យា (75)" required>
+                <div class="invalid-feedback"><span style="font-size: 18px;">សូមបំពេញពិន្ទុចន្លោះពី 0 ទៅ 75</span></div>
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-control" id="geoScore" min="0" max="75" placeholder="ភូមិវិទ្យា (75)" required>
+                <div class="invalid-feedback"><span style="font-size: 18px;">សូមបំពេញពិន្ទុចន្លោះពី 0 ទៅ 75</span></div>
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-control" id="histoScore" min="0" max="75" placeholder="ប្រវត្តិវិទ្យា (75)" required>
+                <div class="invalid-feedback"><span style="font-size: 18px;">សូមបំពេញពិន្ទុចន្លោះពី 0 ទៅ 75</span></div>
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-control" id="moralScore" min="0" max="75" placeholder="សិលធម៍ពលរដ្ឋ (75)" required>
+                <div class="invalid-feedback"><span style="font-size: 18px;">សូមបំពេញពិន្ទុចន្លោះពី 0 ទៅ 75</span></div>
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-control" id="earthScore" min="0" max="50" placeholder="ផែនដីវិទ្យា (50)" required>
+                <div class="invalid-feedback"><span style="font-size: 18px;">សូមបំពេញពិន្ទុចន្លោះពី 0 ទៅ 50</span></div>
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-control" id="englishScore" min="0" max="50" placeholder="ភាសាអង់គ្លេស (50)" required>
+                <div class="invalid-feedback"><span style="font-size: 18px;">សូមបំពេញពិន្ទុចន្លោះពី 0 ទៅ 50</span></div>
+            </div>
+            
+            <button type="button" class="btn btn-primary" onclick="calculateGrades()">គណនាពិន្ទុ</button>
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+            <a href="index.html" class="btn btn-info"><span >វិទ្យាសាស្ត្រពិត</span></a>
+
+        </form>
+        <div class="result">
+            <h2>លទ្ធផល</h2>
+            <div id="subjectGrades"></div>
+            <div id="overallGrade"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function getGrade(score, maxScore, thresholds) {
+            if (score >= thresholds.A) return 'និទ្ទេស A';
+            if (score >= thresholds.B) return 'និទ្ទេស B';
+            if (score >= thresholds.C) return 'និទ្ទេស C';
+            if (score >= thresholds.D) return 'និទ្ទេស D';
+            if (score >= thresholds.E) return 'និទ្ទេស E';
+            return 'និទ្ទេស F';
+        }
+    
+        function validateInputs() {
+            let isValid = true;
+            const fields = [
+                { id: 'khmerScore', max: 125 },
+                { id: 'mathScore', max: 75 },
+                { id: 'geoScore', max: 75 },
+                { id: 'histoScore', max: 75 },
+                { id: 'moralScore', max: 75 },
+                { id: 'earthScore', max: 50 },
+                { id: 'englishScore', max: 50 }
+            ];
+    
+            fields.forEach(field => {
+                let input = document.getElementById(field.id);
+                let value = parseInt(input.value) || 0;
+                if (value < 0 || value > field.max) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+    
+            return isValid;
+        }
+    
+        function calculateGrades() {
+            if (!validateInputs()) {
+                return;
+            }
+    
+            let subjects = {
+                'អក្សរសាស្ត្រខ្មែរ': { score: parseInt(document.getElementById('khmerScore').value) || 0, maxScore: 125, thresholds: { A: 112, B: 100, C: 87, D: 75, E: 62 } },
+                'គណិតវិទ្យា': { score: parseInt(document.getElementById('mathScore').value) || 0, maxScore: 75, thresholds: { A: 67, B: 60, C: 52, D: 45, E: 37 } },
+                'ភូមិវិទ្យា': { score: parseInt(document.getElementById('geoScore').value) || 0, maxScore: 75, thresholds: { A: 67, B: 60, C: 52, D: 45, E: 37 } },
+                'ប្រវត្តិវិទ្យា': { score: parseInt(document.getElementById('histoScore').value) || 0, maxScore: 75, thresholds: { A: 67, B: 60, C: 52, D: 45, E: 37 } },
+                'សិលធម៍ពលរដ្ឋ': { score: parseInt(document.getElementById('moralScore').value) || 0, maxScore: 75, thresholds: { A: 67, B: 60, C: 52, D: 45, E: 37 } },
+                'ផែនដីវិទ្យា': { score: parseInt(document.getElementById('earthScore').value) || 0, maxScore: 50, thresholds: { A: 45, B: 40, C: 35, D: 30, E: 25 } },
+                'ភាសាអង់គ្លេស': { score: parseInt(document.getElementById('englishScore').value) || 0, maxScore: 50, thresholds: { A: 45, B: 40, C: 35, D: 30, E: 25 } }
+            };
+    
+            let totalScore = 0;
+            let totalMaxScore = 0;
+            let subjectGradesHtml = '';
+    
+            for (let subject in subjects) {
+                let subjectData = subjects[subject];
+                let grade = getGrade(subjectData.score, subjectData.maxScore, subjectData.thresholds);
+                subjectGradesHtml += `<p>${subject} ទទួលបាន: ${grade}</p>`;
+                totalScore += subjectData.score;
+                totalMaxScore += subjectData.maxScore;
+            }
+    
+            let overallGrade;
+            let overallPercentage = (totalScore / totalMaxScore) * 100;
+    
+            // Example thresholds for overall grade calculation
+            if (totalScore < 237) {
+                overallGrade = 'និទ្ទេស F ធ្លាក់';
+            } else if (totalScore < 285) {
+                overallGrade = 'និទ្ទេស E';
+            } else if (totalScore < 332) {
+                overallGrade = 'និទ្ទេស D';
+            } else if (totalScore < 380) {
+                overallGrade = 'និទ្ទេស C';
+            } else if (totalScore < 427) {
+                overallGrade = 'និទ្ទេស B';
+            } else {
+                overallGrade = 'និទ្ទេស A';
+            }
+    
+            let resultClass = totalScore < 237 ? 'fail' : 'pass';
+    
+            document.getElementById('subjectGrades').innerHTML = subjectGradesHtml;
+            document.getElementById('overallGrade').innerHTML = `<h3>ពិន្ទុសរុប: ${totalScore} / ${totalMaxScore}</h3><h4 class="grade ${resultClass}">លទ្ធផលទទួលបាន: ${overallGrade}</h4>`;
+        }
+    
+        function resetForm() {
+            document.getElementById('scoreForm').reset();
+            document.getElementById('subjectGrades').innerHTML = '';
+            document.getElementById('overallGrade').innerHTML = '';
+            // Clear any validation error messages
+            let inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.classList.remove('is-invalid');
+            });
+        }
+    </script>
+      <!-- Footer -->
+      <footer>
+        <p>&copy; 2024 by Kongkea. All rights reserved.</p>
+    </footer>
+</body>
+</html>
